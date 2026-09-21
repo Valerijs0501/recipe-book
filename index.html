@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="lv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Recepšu grāmata</title>
+
+    <link rel="stylesheet" href="./css/style.css" />
+    <script src="./js/script.js" defer></script>
+  </head>
+
+  <body>
+    <header>
+      <h1>Recepšu grāmata</h1>
+      <p>Izveido un saglabā receptes</p>
+    </header>
+
+    <main class="container">
+      <section class="form-section">
+        <h2>Pievienot jaunu recepti</h2>
+
+        <form id="recipe-form">
+          <!-- Receptes pamatinformācija -->
+          <div class="form-group">
+            <label for="recipe-name">Receptes nosaukums:</label>
+            <input
+              type="text"
+              id="recipe-name"
+              placeholder="Kartupeļu pankūkas"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="recipe-description">Receptes apraksts:</label>
+            <textarea
+              id="recipe-description"
+              placeholder="Apraksts par recepti"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Ēdiena attēls -->
+          <div class="form-group image-upload-group">
+            <label for="recipe-image">Ēdiena attēls:</label>
+
+            <label for="recipe-image" class="image-upload-box">
+              <input
+                type="file"
+                id="recipe-image"
+                accept="image/jpeg, image/png, image/webp"
+              />
+
+              <span id="image-upload-text">
+                Nospied šeit, lai izvēlētos attēlu
+              </span>
+
+              <img
+                id="image-preview"
+                alt="Izvēlētā ēdiena attēla priekšskatījums"
+                hidden
+              />
+            </label>
+
+            <small>
+              Atļautie formāti: JPG, PNG un WebP. Maksimālais izmērs: 1 MB.
+            </small>
+          </div>
+          <!-- Receptes kategorija -->
+          <div class="form-group">
+            <label for="category">Kategorija:</label>
+            <select id="category">
+              <option value="">Izvēlies kategoriju</option>
+              <option value="brokastis">Brokastis</option>
+              <option value="zupa">Zupa</option>
+              <option value="pamatēdiens">Pamatēdiens</option>
+              <option value="deserts">Deserts</option>
+              <option value="cits">Cits</option>
+            </select>
+          </div>
+
+          <!-- Gatavošanas informācija -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="portions">Porciju skaits:</label>
+              <input type="number" id="portions" min="1" placeholder="4" />
+            </div>
+
+            <div class="form-group">
+              <label for="preparation-time">
+                Sagatavošanas laiks minūtēs:
+              </label>
+              <input
+                type="number"
+                id="preparation-time"
+                min="0"
+                placeholder="15"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="cooking-time">Gatavošanas laiks minūtēs:</label>
+              <input type="number" id="cooking-time" min="0" placeholder="30" />
+            </div>
+
+            <div class="form-group">
+              <label for="temperature">Temperatūra °C:</label>
+              <input type="number" id="temperature" min="0" placeholder="180" />
+            </div>
+          </div>
+
+          <!-- Sastāvdaļas -->
+          <fieldset class="ingredients-section">
+            <legend>Sastāvdaļas</legend>
+
+            <div id="ingredients-list">
+              <div class="ingredient-row">
+                <div class="form-group">
+                  <label for="ingredient-amount-1">Daudzums:</label>
+                  <input
+                    type="number"
+                    id="ingredient-amount-1"
+                    class="ingredient-amount"
+                    min="0"
+                    step="0.01"
+                    placeholder="500"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="ingredient-unit-1">Mērvienība:</label>
+                  <select
+                    id="ingredient-unit-1"
+                    class="ingredient-unit"
+                    required
+                  >
+                    <option value="">Izvēlies</option>
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="ml">ml</option>
+                    <option value="l">l</option>
+                    <option value="gab.">gab.</option>
+                    <option value="ēdamkarote">ēdamkarote</option>
+                    <option value="tējkarote">tējkarote</option>
+                    <option value="šķipsna">šķipsna</option>
+                    <option value="pēc garšas">pēc garšas</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="ingredient-name-1">Nosaukums:</label>
+                  <input
+                    type="text"
+                    id="ingredient-name-1"
+                    class="ingredient-name"
+                    placeholder="Kartupeļi"
+                    required
+                  />
+                </div>
+
+                <button type="button" class="remove-ingredient">Dzēst</button>
+              </div>
+            </div>
+
+            <button type="button" id="add-ingredient">
+              + Pievienot sastāvdaļu
+            </button>
+          </fieldset>
+          <!-- Gatavošanas secība -->
+          <fieldset class="steps-section">
+            <legend>Gatavošanas secība</legend>
+
+            <div id="steps-list">
+              <div class="step-row">
+                <label for="step-1">1. solis:</label>
+
+                <textarea
+                  id="step-1"
+                  class="recipe-step"
+                  placeholder="Apraksti pirmo gatavošanas soli"
+                  required
+                ></textarea>
+
+                <button type="button" class="remove-step">Dzēst soli</button>
+              </div>
+            </div>
+
+            <button type="button" id="add-step">+ Pievienot soli</button>
+          </fieldset>
+
+          <!-- Piezīmes -->
+          <fieldset class="notes-section">
+            <legend>Piezīmes</legend>
+
+            <div class="form-group">
+              <label for="notes">Personīgās piezīmes:</label>
+
+              <textarea
+                id="notes"
+                rows="5"
+                placeholder="Piemēram: nākamreiz pievienot vairāk ķiploku"
+              ></textarea>
+
+              <small>
+                Šeit vari pierakstīt izmaiņas, ieteikumus vai gatavošanas
+                novērojumus.
+              </small>
+            </div>
+          </fieldset>
+          <button type="submit" class="save-button">Saglabāt recepti</button>
+        </form>
+      </section>
+
+      <section id="recipe-list-section">
+        <h2>Recepšu saraksts</h2>
+        <ul id="recipe-list"></ul>
+      </section>
+    </main>
+  </body>
+</html>
