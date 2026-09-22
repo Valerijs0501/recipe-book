@@ -240,6 +240,32 @@ button:focus-visible {
   margin-top: 10px;
 }
 
+.portions-control {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin: 16px 0;
+  padding: 12px;
+  background-color: #f7faf8;
+  border: 1px solid #d8e6dd;
+  border-radius: 8px;
+}
+
+.portions-control .form-group {
+  width: 150px;
+  margin-bottom: 0;
+}
+
+.recalculate-portions {
+  color: white;
+  background-color: #2f6f4e;
+}
+
+.recalculate-portions:hover {
+  background-color: #24583e;
+}
+
 /* Planšetēm un šaurākiem ekrāniem */
 @media (max-width: 850px) {
   .container {

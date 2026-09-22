@@ -84,7 +84,14 @@
           <div class="form-row">
             <div class="form-group">
               <label for="portions">Porciju skaits:</label>
-              <input type="number" id="portions" min="1" placeholder="4" />
+              <input
+                type="number"
+                id="portions"
+                min="1"
+                step="1"
+                placeholder="4"
+                required
+              />
             </div>
 
             <div class="form-group">
@@ -191,24 +198,14 @@
           </fieldset>
 
           <!-- Piezīmes -->
-          <fieldset class="notes-section">
-            <legend>Piezīmes</legend>
+          <div class="form-group">
+            <label for="notes">Piezīmes:</label>
 
-            <div class="form-group">
-              <label for="notes">Personīgās piezīmes:</label>
-
-              <textarea
-                id="notes"
-                rows="5"
-                placeholder="Piemēram: nākamreiz pievienot vairāk ķiploku"
-              ></textarea>
-
-              <small>
-                Šeit vari pierakstīt izmaiņas, ieteikumus vai gatavošanas
-                novērojumus.
-              </small>
-            </div>
-          </fieldset>
+            <textarea
+              id="notes"
+              placeholder="Piemēram: nākamreiz pievienot vairāk ķiploku"
+            ></textarea>
+          </div>
           <button type="submit" class="save-button">Saglabāt recepti</button>
         </form>
       </section>

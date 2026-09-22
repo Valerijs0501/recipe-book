@@ -211,18 +211,23 @@ const savedRecipes = localStorage.getItem("recipes");
 
 let recipes = savedRecipes ? JSON.parse(savedRecipes) : [];
 
+// Savāc visas receptes sastāvdaļas
 function collectIngredients() {
   const ingredientRows = ingredientsList.querySelectorAll(".ingredient-row");
 
   return Array.from(ingredientRows).map(function (row) {
+    const amount = Number(row.querySelector(".ingredient-amount").value);
+
     return {
-      amount: row.querySelector(".ingredient-amount").value,
+      amount: amount,
+      baseAmount: amount,
       unit: row.querySelector(".ingredient-unit").value,
       name: row.querySelector(".ingredient-name").value.trim(),
     };
   });
 }
 
+// Savāc visus receptes pagatavošanas soļus
 function collectSteps() {
   const stepFields = stepsList.querySelectorAll(".recipe-step");
 
@@ -230,7 +235,6 @@ function collectSteps() {
     return textarea.value.trim();
   });
 }
-
 function saveRecipes() {
   const recipesAsText = JSON.stringify(recipes);
 
@@ -245,6 +249,69 @@ function createTextElement(tagName, text) {
   return element;
 }
 
+function roundIngredientAmount(amount) {
+  return Math.round((amount + Number.EPSILON) * 100) / 100;
+}
+// ===== SAGATAVO ARĪ IEPRIEKŠ SAGLABĀTĀS RECEPTES =====
+
+function prepareRecipeScalingData() {
+  let dataWasChanged = false;
+
+  recipes.forEach(function (recipe) {
+    const currentPortions = Number(recipe.portions) || 1;
+    const basePortions = Number(recipe.basePortions);
+
+    if (!Number.isFinite(basePortions) || basePortions < 1) {
+      recipe.basePortions = currentPortions;
+      recipe.portions = currentPortions;
+
+      dataWasChanged = true;
+    }
+
+    recipe.ingredients.forEach(function (ingredient) {
+      const baseAmount = Number(ingredient.baseAmount);
+
+      if (!Number.isFinite(baseAmount)) {
+        ingredient.baseAmount = Number(ingredient.amount) || 0;
+
+        dataWasChanged = true;
+      }
+    });
+  });
+
+  if (dataWasChanged) {
+    saveRecipes();
+  }
+}
+// ===== IZMAIŅA 4: IZVEIDO PORCIJU MAIŅAS LAUKU =====
+
+function createPortionsControl(recipe) {
+  const portionsControl = document.createElement("div");
+  portionsControl.classList.add("portions-control");
+
+  const portionsLabel = createTextElement("label", "Jaunais porciju skaits:");
+
+  const portionsInput = document.createElement("input");
+
+  portionsInput.type = "number";
+  portionsInput.min = "1";
+  portionsInput.step = "1";
+  portionsInput.value = recipe.portions;
+  portionsInput.classList.add("recipe-portions");
+
+  const recalculateButton = createTextElement(
+    "button",
+    "Pārrēķināt sastāvdaļas",
+  );
+
+  recalculateButton.type = "button";
+  recalculateButton.classList.add("recalculate-portions");
+  recalculateButton.dataset.id = recipe.id;
+
+  portionsControl.append(portionsLabel, portionsInput, recalculateButton);
+
+  return portionsControl;
+}
 function displayRecipes() {
   recipeList.innerHTML = "";
 
@@ -289,7 +356,9 @@ function displayRecipes() {
     );
 
     recipeCard.append(information);
+    const portionsControl = createPortionsControl(recipe);
 
+    recipeCard.append(portionsControl);
     const ingredientsTitle = createTextElement("h4", "Sastāvdaļas");
 
     const ingredientsListElement = document.createElement("ul");
@@ -367,6 +436,14 @@ function resetRecipeForm() {
 function addRecipe(event) {
   event.preventDefault();
 
+  // ===== NOLASA UN PĀRBAUDA PORCIJU SKAITU =====
+
+  const portions = Number(document.querySelector("#portions").value);
+
+  if (!Number.isInteger(portions) || portions < 1) {
+    alert("Porciju skaitam jābūt veselam skaitlim, kas ir vismaz 1.");
+    return;
+  }
   const recipe = {
     id: Date.now(),
 
@@ -376,7 +453,11 @@ function addRecipe(event) {
     image: selectedImageData,
 
     category: document.querySelector("#category").value,
-    portions: document.querySelector("#portions").value,
+    // Pašreizējais porciju skaits
+    portions: portions,
+
+    // Sākotnējais porciju skaits aprēķiniem
+    basePortions: portions,
 
     preparationTime: document.querySelector("#preparation-time").value,
 
@@ -396,6 +477,7 @@ function addRecipe(event) {
   displayRecipes();
   resetRecipeForm();
 }
+// ===== DZĒŠ IZVĒLĒTO RECEPTI =====
 
 function deleteRecipe(event) {
   if (!event.target.classList.contains("delete-recipe")) {
@@ -411,8 +493,62 @@ function deleteRecipe(event) {
   saveRecipes();
   displayRecipes();
 }
+// ===== IZMAIŅA 6: PĀRRĒĶINA SASTĀVDAĻU DAUDZUMUS =====
 
+function recalculatePortions(event) {
+  const clickedButton = event.target.closest(".recalculate-portions");
+
+  if (!clickedButton) {
+    return;
+  }
+
+  const selectedRecipeId = Number(clickedButton.dataset.id);
+
+  const selectedRecipe = recipes.find(function (recipe) {
+    return recipe.id === selectedRecipeId;
+  });
+
+  if (!selectedRecipe) {
+    return;
+  }
+
+  const portionsControl = clickedButton.closest(".portions-control");
+
+  const portionsInput = portionsControl.querySelector(".recipe-portions");
+
+  const newPortions = Number(portionsInput.value);
+
+  if (!Number.isInteger(newPortions) || newPortions < 1) {
+    alert("Porciju skaitam jābūt veselam skaitlim, kas ir vismaz 1.");
+
+    portionsInput.value = selectedRecipe.portions;
+    return;
+  }
+
+  const multiplier = newPortions / selectedRecipe.basePortions;
+
+  selectedRecipe.ingredients.forEach(function (ingredient) {
+    const newAmount = ingredient.baseAmount * multiplier;
+
+    ingredient.amount = roundIngredientAmount(newAmount);
+  });
+
+  selectedRecipe.portions = newPortions;
+
+  saveRecipes();
+  displayRecipes();
+}
+// Saglabā jaunu recepti
 recipeForm.addEventListener("submit", addRecipe);
+
+// Dzēš izvēlēto recepti
 recipeList.addEventListener("click", deleteRecipe);
 
+// Pārrēķina sastāvdaļas jaunajam porciju skaitam
+recipeList.addEventListener("click", recalculatePortions);
+
+// Pielāgo iepriekš saglabātās receptes jaunajai datu struktūrai
+prepareRecipeScalingData();
+
+// Parāda visas saglabātās receptes
 displayRecipes();
