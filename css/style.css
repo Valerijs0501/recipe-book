@@ -204,7 +204,18 @@ button:focus-visible {
 .save-button:hover {
   background-color: #194879;
 }
+/* Recepšu meklētājs */
+.recipe-search {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
 
+#search-result-count {
+  margin: 8px 0 16px;
+  color: #666;
+  font-size: 0.95rem;
+}
 /* Saglabātās receptes */
 #recipe-list {
   display: grid;

@@ -212,6 +212,22 @@
 
       <section id="recipe-list-section">
         <h2>Recepšu saraksts</h2>
+
+        <!-- JAUNS: recepšu meklētājs -->
+        <div class="recipe-search">
+          <label for="recipe-search">Meklēt recepti:</label>
+
+          <input
+            type="search"
+            id="recipe-search"
+            placeholder="Piemēram: kartupeļi, sīpoli, olas"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- JAUNS: atrasto recepšu skaits -->
+        <p id="search-result-count" aria-live="polite"></p>
+
         <ul id="recipe-list"></ul>
       </section>
     </main>

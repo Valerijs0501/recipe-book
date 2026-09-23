@@ -204,8 +204,14 @@ function removeStep(event) {
 
 addStepButton.addEventListener("click", addStep);
 stepsList.addEventListener("click", removeStep);
+
 const recipeForm = document.querySelector("#recipe-form");
 const recipeList = document.querySelector("#recipe-list");
+
+// ===== RECEPŠU MEKLĒTĀJS =====
+
+const recipeSearchInput = document.querySelector("#recipe-search");
+const searchResultCount = document.querySelector("#search-result-count");
 
 const savedRecipes = localStorage.getItem("recipes");
 
@@ -312,8 +318,41 @@ function createPortionsControl(recipe) {
 
   return portionsControl;
 }
+// Atlasa receptes pēc nosaukuma vai sastāvdaļas
+function getFilteredRecipes() {
+  const searchTerms = recipeSearchInput.value
+    .toLowerCase()
+    .split(",")
+    .map(function (term) {
+      return term.trim();
+    })
+    .filter(function (term) {
+      return term !== "";
+    });
+
+  // Ja meklētājs ir tukšs, parāda visas receptes
+  if (searchTerms.length === 0) {
+    return recipes;
+  }
+
+  return recipes.filter(function (recipe) {
+    return searchTerms.every(function (searchTerm) {
+      const titleMatches = recipe.title.toLowerCase().includes(searchTerm);
+
+      const ingredientMatches = recipe.ingredients.some(function (ingredient) {
+        return ingredient.name.toLowerCase().includes(searchTerm);
+      });
+
+      return titleMatches || ingredientMatches;
+    });
+  });
+}
 function displayRecipes() {
   recipeList.innerHTML = "";
+
+  const filteredRecipes = getFilteredRecipes();
+
+  searchResultCount.textContent = `Atrastas receptes: ${filteredRecipes.length} no ${recipes.length}`;
 
   if (recipes.length === 0) {
     const emptyMessage = createTextElement(
@@ -324,8 +363,18 @@ function displayRecipes() {
     recipeList.append(emptyMessage);
     return;
   }
+  // Receptes ir saglabātas, bet neviena neatbilst meklējumam
+  if (filteredRecipes.length === 0) {
+    const noResultsMessage = createTextElement(
+      "li",
+      "Neviena recepte netika atrasta.",
+    );
 
-  recipes.forEach(function (recipe) {
+    recipeList.append(noResultsMessage);
+    return;
+  }
+
+  filteredRecipes.forEach(function (recipe) {
     const recipeCard = document.createElement("li");
     recipeCard.classList.add("recipe-card");
 
@@ -546,6 +595,9 @@ recipeList.addEventListener("click", deleteRecipe);
 
 // Pārrēķina sastāvdaļas jaunajam porciju skaitam
 recipeList.addEventListener("click", recalculatePortions);
+
+// Filtrē receptes katru reizi, kad meklētājā tiek ievadīts teksts
+recipeSearchInput.addEventListener("input", displayRecipes);
 
 // Pielāgo iepriekš saglabātās receptes jaunajai datu struktūrai
 prepareRecipeScalingData();
